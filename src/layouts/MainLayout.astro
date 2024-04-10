@@ -1,0 +1,195 @@
+---
+import "../app.css";
+
+import { Schema } from "astro-seo-schema";
+import { siteData } from "@lib/store";
+import { ViewTransitions, fade, slide } from "astro:transitions";
+// import { getImage } from "astro:assets";
+import schemaImage1 from "../assets/pj24_schema_1x1.jpg";
+import schemaImage2 from "../assets/pj24_schema_4x3.jpg";
+import schemaImage3 from "../assets/pj24_schema_16x9.jpg";
+
+// const oSchemaImage1 = await getImage({ src: schemaImage1, format: "webp" });
+// const oSchemaImage2 = await getImage({ src: schemaImage2, format: "webp" });
+// const oSchemaImage3 = await getImage({ src: schemaImage3, format: "webp" });
+
+interface Props {
+  language?: Language;
+  title?: string;
+  og?: boolean;
+  schema?: boolean;
+  noindex?: boolean;
+  nofollow?: boolean;
+}
+
+const { language = "et", title = "", og, schema, noindex, nofollow } = Astro.props;
+
+const data: SiteData = siteData.get();
+
+// ADD TRAILING SLASH IF NEEDED
+const base = data.base.replace(/\/?$/, "/");
+const langBase = `${base}${language === "en" ? "en/" : ""}`;
+---
+
+<script>
+  // VIEWTRANSITIONS FIX
+  document.addEventListener("astro:after-swap", () => {
+    // if (history.scrollRestoration) history.scrollRestoration = "auto";
+
+    document.documentElement.classList.add("smooth-scroll");
+
+    const backButton: HTMLButtonElement = document.querySelector("[data-back-button]");
+
+    if (backButton) {
+      backButton.addEventListener("click", () => history.back());
+
+      backButton.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key == "Escape" || e.key == "Enter") history.back();
+      });
+
+      backButton.focus();
+    }
+  });
+</script>
+
+<html lang={language} transition:animate={fade({ duration: "0.3s" })}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#FFF" />
+    <meta name="application-name" content="Pühajärve jaanituli 2024" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/apple-touch-icon-167x167.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png" />
+    <link rel="apple-touch-icon" sizes="1024x1024" href="/apple-touch-icon-1024x1024.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Pühajärve jaanituli 2024" />
+    <meta name="msapplication-TileColor" content="#FFF" />
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+
+    <link rel="canonical" href={langBase} />
+    <link rel="alternate" hreflang="et" href={base} />
+    <link rel="alternate" hreflang="en" href=`${base}en/` />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <title>{title}</title>
+    {data.description && <meta name="description" content={data.description} />}
+    {data.keywords && <meta name="keywords" content={data.keywords.join(", ")} />}
+    <meta name="robots" content={`${noindex ? "noindex" : "index"}, ${nofollow ? "nofollow" : "follow"}`} />
+    <meta name="google" content="nositelinkssearchbox" />
+
+    <!-- OPEN GRAPH -->
+    {
+      og && (
+        <>
+          <meta property="og:type" content="website" />
+          <meta property="og:locale:alternate" content="et_EE" />
+          <meta property="og:locale:alternate" content="en_GB" />
+          <meta property="og:title" content={title} />
+          <meta property="og:url" content={langBase} />
+          {data.description && <meta property="og:description" content={data.description} />}
+          {data.ogImage && <meta property="og:image" content={data.ogImage} />}
+        </>
+      )
+    }
+
+    <!-- STRUCTURED DATA -->
+    {
+      schema && (
+        <>
+          <Schema
+            item={{
+              "@context": "https://schema.org",
+              "@type": "MusicEvent",
+              name: title,
+              url: langBase,
+              image: [schemaImage1.src, schemaImage2.src, schemaImage3.src],
+              description: data.description,
+              startDate: "2024-06-22",
+              endDate: "2024-06-24",
+              eventStatus: "https://schema.org/EventScheduled",
+              eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+              location: { "@type": "Place", name: "Pühajärve park, Otepää", address: "Ranna tee 1, Otepää, Estonia" },
+              offers: {
+                "@type": "Offer",
+                url: "https://tickets.monstermusic.ee/jaanituli",
+                availability: "https://schema.org/InStock",
+                validFrom: "2024-03-01",
+                priceCurrency: "EUR",
+              },
+              organizer: {
+                "@type": "Organization",
+                name: "Monster Music",
+                url: "https://monstermusic.ee/",
+              },
+              performer: [
+                {
+                  "@type": "MusicGroup",
+                  name: "Nervo",
+                  sameAs: "https://www.facebook.com/NERVOmusic/",
+                },
+                {
+                  "@type": "Person",
+                  name: "Luude",
+                  sameAs: "https://www.facebook.com/Luudeofficial",
+                },
+                {
+                  "@type": "Person",
+                  name: "Quintino",
+                  sameAs: "https://www.facebook.com/DJQUINTINO",
+                },
+                {
+                  "@type": "Person",
+                  name: "A.M.C",
+                  sameAs: "https://www.instagram.com/a.m.ctitan",
+                },
+                {
+                  "@type": "Person",
+                  name: "1991",
+                  sameAs: "https://www.facebook.com/1991music",
+                },
+                {
+                  "@type": "Person",
+                  name: "Issey Cross",
+                  sameAs: "https://www.facebook.com/isseycross",
+                },
+              ],
+            }}
+          />
+        </>
+      )
+    }
+
+    <ViewTransitions />
+  </head>
+
+  <!-- SMOOTH SCROLL ONLY FOR ANCHOR NAVIGATION -->
+  <body onload="document.documentElement.classList.add('smooth-scroll');" class="overflow-x-hidden">
+    <slot />
+
+    <noscript>
+      <div>
+        <style>
+          html {
+            scroll-behavior: smooth;
+          }
+        </style>
+      </div>
+    </noscript>
+  </body></html
+>
